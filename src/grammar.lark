@@ -1,0 +1,35 @@
+start: definition* value
+
+definition: "(" _DEFINE NAME value ")"
+
+?value: NUMBER -> number
+      | array
+      | dictionary
+      | expression
+
+array: "(" _LIST value* ")"
+dictionary: _BEGIN pair* _END
+pair: NAME ":=" value ";"
+
+?expression: "{" "+" operand operand "}" -> add
+           | "{" "-" operand operand "}" -> subtract
+           | "{" _SORT operand "}" -> sort_values
+           | "{" NAME "}" -> reference
+
+?operand: value
+        | INTEGER -> number
+        | NAME -> reference
+
+_DEFINE: /define(?!\w)/
+_LIST: /list(?!\w)/
+_BEGIN: /begin(?!\w)/
+_END: /end(?!\w)/
+_SORT: /sort(?!\w)/
+NAME: /[a-z]+(?!\w)/
+NUMBER: /[+-]?\d+\.?\d*[eE][+-]?\d+(?![\w.])/
+INTEGER: /[+-]?\d+(?![\w.])/
+
+%import common.WS
+%ignore WS
+%ignore /C[^\r\n]*/
+%ignore /\/\+[\s\S]*?\+\//
